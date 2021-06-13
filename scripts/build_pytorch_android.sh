@@ -1,5 +1,5 @@
 #!/bin/bash
-set -eux
+# set -eux
 
 ##############################################################################
 # Master script to build PyTorch Android library with Java bindings.
@@ -35,10 +35,10 @@ parse_abis_list "$@"
 build_android
 
 # To set proxy for gradle add following lines to ./gradle/gradle.properties:
-# systemProp.http.proxyHost=...
-# systemProp.http.proxyPort=8080
-# systemProp.https.proxyHost=...
-# systemProp.https.proxyPort=8080
+systemProp.http.proxyHost=...
+systemProp.http.proxyPort=8080
+systemProp.https.proxyHost=...
+systemProp.https.proxyPort=8080
 
 if [ "$CUSTOM_ABIS_LIST" = true ]; then
   # Skipping clean task here as android gradle plugin 3.3.2 exteralNativeBuild has problems
@@ -49,3 +49,15 @@ else
 fi
 
 find $PYTORCH_ANDROID_DIR -type f -name *aar | xargs ls -lah
+
+if [ "${GRADLE_RELEASE}" == 1 ] && [ "${BUILD_LITE_INTERPRETER}" == 0 ]; then
+  echo "Running gradle for release and building full jit"
+  GRADLE_PROPERTIES_FILE="$PYTORCH_DIR/android/pytorch_android/gradle.properties"
+  echo ${GRADLE_PROPERTIES_FILE}
+  # Clean the existing content in gradle.properties
+  echo -n "" > ${GRADLE_PROPERTIES_FILE}
+  echo "POM_NAME=pytorch_android_lite pytorch android api" >> "${GRADLE_PROPERTIES_FILE}"
+  echo "POM_DESCRIPTION=pytorch_android_lite pytorch android api" >> "${GRADLE_PROPERTIES_FILE}"
+  echo "POM_ARTIFACT_ID=pytorch_android_lite" >> "${GRADLE_PROPERTIES_FILE}"
+  echo "POM_PACKAGING=aar" >> "${GRADLE_PROPERTIES_FILE}"
+fi
