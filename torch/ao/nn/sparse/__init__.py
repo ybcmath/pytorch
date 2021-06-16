@@ -1,3 +1,3 @@
 from .linear import Linear
 
-from . import quantized
+from torch.ao.nn.sparse import quantized
