@@ -123,9 +123,14 @@ class RegisterDispatchKey:
             returns = ret_name
 
         functional_sig = self.wrapper_kernel_sig(g.functional)
+        class_name_opt = self.backend_index.native_function_class_name()
+        if class_name_opt is None:
+            wrapper_name = sig.name()
+        else:
+            wrapper_name = f'{class_name_opt}::{sig.name()}'
 
         return f"""\
-{sig.defn()} {{
+{sig.defn(name=wrapper_name)} {{
   auto {func_res} = {functional_sig.name()}({", ".join(e.expr for e in translate(sig.arguments(), functional_sig.arguments()))});
   {updates}
   return {returns};
@@ -227,7 +232,11 @@ return {sig.name()}({', '.join(e.expr for e in translate(cpp_sig.arguments(), si
                 metadata = self.backend_index.get_kernel(f)
                 if metadata is None:
                     return None
-                impl_name = f"{self.cpp_namespace}::{metadata.kernel}"
+                class_name_opt = self.backend_index.native_function_class_name()
+                if class_name_opt is None:
+                    impl_name = f"{self.cpp_namespace}::{metadata.kernel}"
+                else:
+                    impl_name = f"{self.cpp_namespace}::{class_name_opt}::{metadata.kernel}"
 
                 args_exprs_str = ', '.join(a.name for a in args)
 
