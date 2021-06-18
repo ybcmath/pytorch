@@ -17,6 +17,7 @@ namespace c10 {
   _(TensorType)             \
   _(StorageType)            \
   _(TupleType)              \
+  _(UnionType)              \
   _(ListType)               \
   _(DictType)               \
   _(NumberType)             \
@@ -203,7 +204,7 @@ struct TORCH_API Type : std::enable_shared_from_this<Type> {
   // contained_types
   TypePtr withContained(std::vector<TypePtr> contained_types) {
     auto current_contained = containedTypes();
-    AT_ASSERT(current_contained.size() == contained_types.size());
+    TORCH_INTERNAL_ASSERT(current_contained.size() == contained_types.size());
     if (current_contained.equals(contained_types)) {
       return shared_from_this();
     }
