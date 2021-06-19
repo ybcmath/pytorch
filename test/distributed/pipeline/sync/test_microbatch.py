@@ -34,7 +34,6 @@ def test_batch_non_atomic():
 
     with pytest.raises(AttributeError):
         b.tensor
-    assert b.tensors == (x, y)
 
     assert list(b) == [x, y]
     assert len(b) == 2
@@ -135,7 +134,7 @@ def test_scatter_multiple_tensors():
 
     a, b = scatter(*ab, chunks=2)
 
-    assert a.tensors[0].size() == (1, 1)
-    assert b.tensors[0].size() == (1, 1)
-    assert a.tensors[1].size() == (2, 2)
-    assert b.tensors[1].size() == (2, 2)
+    assert list(a)[0].size() == (1, 1)
+    assert list(b)[0].size() == (1, 1)
+    assert list(a)[1].size() == (2, 2)
+    assert list(b)[1].size() == (2, 2)
